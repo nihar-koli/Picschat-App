@@ -2,8 +2,10 @@ package com.example.snapchatapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.text.AlphabeticIndex;
 import android.net.Uri;
@@ -93,9 +95,23 @@ public class ChooseUserListActivity extends AppCompatActivity {
                     }
                 });
 
-                Intent intent = new Intent(ChooseUserListActivity.this,SnapsActivity.class);
+                new AlertDialog.Builder(ChooseUserListActivity.this)
+                        .setTitle("Status...")
+                        .setMessage("Snap sent successfully!")
+                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(ChooseUserListActivity.this,SnapsActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+
+             /*   Intent intent = new Intent(ChooseUserListActivity.this,SnapsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                startActivity(intent);*/
             }
         });
 
