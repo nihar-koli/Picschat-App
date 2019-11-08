@@ -40,9 +40,6 @@ public class CreateSnaps extends AppCompatActivity {
     String imageName = UUID.randomUUID().toString() + ".jpg";
     Button next;
     Button choose;
-    ConstraintLayout loadingLayout;
-    ConstraintLayout createLayout;
-    ProgressBar progressBar;
     ProgressDialog progressDialog;
 
     public void nextClicked(View view){
@@ -50,13 +47,7 @@ public class CreateSnaps extends AppCompatActivity {
         next.setEnabled(false);
         choose.setEnabled(false);
 
-        //createLayout.setAlpha((float) 0.2);
-        //loadingLayout.setAlpha((float)1.0);
-        // loadingLayout.setVisibility(View.VISIBLE);
         showProgressDialogWithTitle("Creating Snap","Please wait...");
-
-
-        //Toast.makeText(this, "Creating Snap! Please Wait...", Toast.LENGTH_LONG).show();
 
         // Get the data from an ImageView as bytes
         snapImageView.setDrawingCacheEnabled(true);
@@ -72,7 +63,6 @@ public class CreateSnaps extends AppCompatActivity {
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
                 Log.e("Status",exception.toString());
-                loadingLayout.setVisibility(View.GONE);
                 new AlertDialog.Builder(CreateSnaps.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("ERROR!")
@@ -152,13 +142,8 @@ public class CreateSnaps extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
         next = findViewById(R.id.nextButton);
         choose = findViewById(R.id.chooseImageButton);
-        loadingLayout = findViewById(R.id.loadingLayout);
-        createLayout = findViewById(R.id.createLayout);
-        progressBar = findViewById(R.id.progressBar);
-
         progressDialog = new ProgressDialog(this);
 
-        loadingLayout.setVisibility(View.INVISIBLE);
         next.setEnabled(false);
         choose.setEnabled(true);
 
