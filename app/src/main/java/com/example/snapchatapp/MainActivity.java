@@ -49,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
                                         .setIcon(android.R.drawable.ic_dialog_alert)
                                         .setTitle("ERROR!!!")
                                         .setMessage("Login failed! Please try again...")
-                                        .setNeutralButton("Ok", null)
+                                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                emailEditText.setText("");
+                                                passwordEditText.setText("");
+                                            }
+                                        })
+                                        .setCancelable(false)
                                         .show();
                             }
                         }
@@ -58,8 +65,9 @@ public class MainActivity extends AppCompatActivity {
             new AlertDialog.Builder(MainActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("ERROR!!!")
-                    .setMessage("Login failed! Please try again...")
+                    .setMessage("Login failed! Please fill all details...")
                     .setNeutralButton("Ok", null)
+                    .setCancelable(false)
                     .show();
         }
     }

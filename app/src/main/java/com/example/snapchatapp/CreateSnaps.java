@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,13 +40,23 @@ public class CreateSnaps extends AppCompatActivity {
     String imageName = UUID.randomUUID().toString() + ".jpg";
     Button next;
     Button choose;
+    ConstraintLayout loadingLayout;
+    ConstraintLayout createLayout;
+    ProgressBar progressBar;
+    ProgressDialog progressDialog;
 
     public void nextClicked(View view){
 
         next.setEnabled(false);
         choose.setEnabled(false);
 
-        Toast.makeText(this, "Creating Snap! Please Wait...", Toast.LENGTH_LONG).show();
+        //createLayout.setAlpha((float) 0.2);
+        //loadingLayout.setAlpha((float)1.0);
+        // loadingLayout.setVisibility(View.VISIBLE);
+        showProgressDialogWithTitle("Creating Snap","Please wait...");
+
+
+        //Toast.makeText(this, "Creating Snap! Please Wait...", Toast.LENGTH_LONG).show();
 
         // Get the data from an ImageView as bytes
         snapImageView.setDrawingCacheEnabled(true);
@@ -59,6 +72,7 @@ public class CreateSnaps extends AppCompatActivity {
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
                 Log.e("Status",exception.toString());
+                loadingLayout.setVisibility(View.GONE);
                 new AlertDialog.Builder(CreateSnaps.this)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("ERROR!")
@@ -69,7 +83,9 @@ public class CreateSnaps extends AppCompatActivity {
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(final UploadTask.TaskSnapshot taskSnapshot) {
-                 Intent intent = new Intent(CreateSnaps.this,ChooseUserListActivity.class);
+                hideProgressDialogWithTitle();
+                //loadingLayout.setVisibility(View.GONE);
+                Intent intent = new Intent(CreateSnaps.this,ChooseUserListActivity.class);
                 intent.putExtra("imageName",imageName);
                 intent.putExtra("message",messageEditText.getText().toString());
                 startActivity(intent);
@@ -136,9 +152,32 @@ public class CreateSnaps extends AppCompatActivity {
         mStorageRef = FirebaseStorage.getInstance().getReference();
         next = findViewById(R.id.nextButton);
         choose = findViewById(R.id.chooseImageButton);
+        loadingLayout = findViewById(R.id.loadingLayout);
+        createLayout = findViewById(R.id.createLayout);
+        progressBar = findViewById(R.id.progressBar);
 
+        progressDialog = new ProgressDialog(this);
+
+        loadingLayout.setVisibility(View.INVISIBLE);
         next.setEnabled(false);
         choose.setEnabled(true);
 
+    }
+
+    private void showProgressDialogWithTitle(String title,String substring) {
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        //Without this user can hide loader by tapping outside screen
+        progressDialog.setCancelable(false);
+        //Setting Title
+        progressDialog.setTitle(title);
+        progressDialog.setMessage(substring);
+        progressDialog.show();
+
+    }
+
+    // Method to hide/ dismiss Progress bar
+    private void hideProgressDialogWithTitle() {
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.dismiss();
     }
 }

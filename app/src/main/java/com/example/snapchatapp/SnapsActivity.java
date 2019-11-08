@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.widgets.Snapshot;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,6 +29,7 @@ public class SnapsActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     ListView snapListView;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,9 @@ public class SnapsActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         setTitle("Your Feed");
+        progressDialog = new ProgressDialog(this);
 
+        hideProgressDialogWithTitle();
         snapListView = findViewById(R.id.snapListView);
 
         final ArrayList<String> emails = new ArrayList<String>();
@@ -84,6 +88,8 @@ public class SnapsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 DataSnapshot dataSnapshot = snaps.get(position);
 
+                showProgressDialogWithTitle("Loading","Please wait...");
+
                 Intent intent = new Intent(SnapsActivity.this,ViewSnapActivity.class);
                 intent.putExtra("imageName",dataSnapshot.child("imageName").getValue().toString());
                 intent.putExtra("imageUrl",dataSnapshot.child("imageUrl").getValue().toString());
@@ -92,6 +98,7 @@ public class SnapsActivity extends AppCompatActivity {
                 intent.putExtra("snapKey",dataSnapshot.getKey());
 
                 startActivity(intent);
+
             }
         });
 
@@ -129,6 +136,23 @@ public class SnapsActivity extends AppCompatActivity {
     public void createSnap(View view){
         Intent intent = new Intent(this,CreateSnaps.class);
         startActivity(intent);
+    }
+
+    public void showProgressDialogWithTitle(String title,String substring) {
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        //Without this user can hide loader by tapping outside screen
+        progressDialog.setCancelable(false);
+        //Setting Title
+        progressDialog.setTitle(title);
+        progressDialog.setMessage(substring);
+        progressDialog.show();
+
+    }
+
+    // Method to hide/ dismiss Progress bar
+    public void hideProgressDialogWithTitle() {
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.dismiss();
     }
 
 }

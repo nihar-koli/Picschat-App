@@ -2,6 +2,7 @@ package com.example.snapchatapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -72,9 +73,10 @@ public class ViewSnapActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("snaps").child(getIntent().getStringExtra("snapKey")).removeValue();
         FirebaseStorage.getInstance().getReference().child("images").child(getIntent().getStringExtra("imageName")).delete();
+        Intent intent = new Intent(getApplicationContext(),SnapsActivity.class);
+        startActivity(intent);
     }
     @Override
     protected void onUserLeaveHint() {
@@ -82,5 +84,8 @@ public class ViewSnapActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid()).child("snaps").child(getIntent().getStringExtra("snapKey")).removeValue();
         FirebaseStorage.getInstance().getReference().child("images").child(getIntent().getStringExtra("imageName")).delete();
+        Intent intent = new Intent(getApplicationContext(),SnapsActivity.class);
+        startActivity(intent);
+
     }
 }
