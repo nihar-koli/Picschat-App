@@ -114,8 +114,6 @@ public class SnapsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.logout){
-
-
             mAuth.signOut();
             finish();
         }
