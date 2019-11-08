@@ -9,63 +9,37 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 
-public class MainActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     EditText emailEditText;
     EditText passwordEditText;
+    EditText cpasswordEditText;
     private FirebaseAuth mAuth;
 
-    public void snaps(){
-        emailEditText.setText("");
-        passwordEditText.setText("");
-        Intent intent = new Intent(this,SnapsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(intent);
-
-    }
-
-    public void login(View view){
-        if(!emailEditText.getText().toString().equals("") && !passwordEditText.getText().toString().equals("")) {
-            mAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                               Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                snaps();
-                            } else {
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("ERROR!!!")
-                                        .setMessage("Login failed! Please try again...")
-                                        .setNeutralButton("Ok", null)
-                                        .show();
-                            }
-                        }
-                    });
-        }else{
-            new AlertDialog.Builder(MainActivity.this)
+    public void signup(View view){
+        if(emailEditText.getText().toString().equals("") || passwordEditText.getText().toString().equals("") || cpasswordEditText.getText().toString().equals("")){
+            new AlertDialog.Builder(RegisterActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("ERROR!!!")
-                    .setMessage("Login failed! Please try again...")
-                    .setNeutralButton("Ok", null)
+                    .setMessage("Please fill all details...")
+                    .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            emailEditText.setText("");
+                            passwordEditText.setText("");
+                        }
+                    })
+                    .setCancelable(false)
                     .show();
-        }
-    }
-
-    public void signup1(View view){
-        if(!emailEditText.getText().toString().equals("") && !passwordEditText.getText().toString().equals("")) {
+        }else if(passwordEditText.getText().toString().equals(cpasswordEditText.getText().toString())){
             mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -77,12 +51,19 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-
-                                Toast.makeText(MainActivity.this, "SignUp Successful!", Toast.LENGTH_SHORT).show();
-                                snaps();
+                                new AlertDialog.Builder(RegisterActivity.this)
+                                        .setMessage("SignUp Successful!")
+                                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                finish();
+                                            }
+                                        })
+                                        .setCancelable(false)
+                                        .show();
                             } else {
                                 // If sign in fails, display a message to the user.
-                                new AlertDialog.Builder(MainActivity.this)
+                                new AlertDialog.Builder(RegisterActivity.this)
                                         .setIcon(android.R.drawable.ic_dialog_alert)
                                         .setTitle("ERROR!!!")
                                         .setMessage("SignUp failed! Please try again...")
@@ -91,59 +72,43 @@ public class MainActivity extends AppCompatActivity {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 emailEditText.setText("");
                                                 passwordEditText.setText("");
+                                                cpasswordEditText.setText("");
                                             }
                                         })
+                                        .setCancelable(false)
                                         .show();
                             }
 
                         }
                     });
         }else{
-            new AlertDialog.Builder(MainActivity.this)
+            new AlertDialog.Builder(RegisterActivity.this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("ERROR!!!")
-                    .setMessage("SignUp failed! Please try again...")
+                    .setMessage("Password mismatch...")
                     .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            emailEditText.setText("");
                             passwordEditText.setText("");
+                            cpasswordEditText.setText("");
                         }
                     })
+                    .setCancelable(false)
                     .show();
         }
-    }
-
-    public void signup(View view){
-        Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_register);
 
-        setTitle("Picschat");
+        setTitle("Register");
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
+        cpasswordEditText = findViewById(R.id.cpasswordEditText);
         mAuth = FirebaseAuth.getInstance();
 
-        emailEditText.setText("");
-        passwordEditText.setText("");
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if(currentUser != null){
-            snaps();
-        }
     }
 }

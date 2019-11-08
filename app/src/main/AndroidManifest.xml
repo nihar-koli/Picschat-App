@@ -14,7 +14,8 @@
         android:label="Picschat"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
-        <activity android:name=".ViewSnapActivity"></activity>
+        <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".ViewSnapActivity" />
         <activity android:name=".ChooseUserListActivity" />
         <activity android:name=".CreateSnaps" />
         <activity android:name=".SnapsActivity" />
