@@ -3,11 +3,14 @@ package com.example.snapchatapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,7 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     EditText emailEditText;
     EditText passwordEditText;
@@ -109,6 +112,26 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
         cpasswordEditText = findViewById(R.id.cpasswordEditText);
         mAuth = FirebaseAuth.getInstance();
+        ConstraintLayout registerLayout = findViewById(R.id.registerLayout);
+        registerLayout.setOnClickListener(this);
+        cpasswordEditText.setOnKeyListener(this);
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.registerLayout){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
+    }
+
+    @Override
+    public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+        if(i == keyEvent.KEYCODE_ENTER && keyEvent.getAction() == keyEvent.ACTION_DOWN){
+            signup(view);
+        }
+        return false;
     }
 }

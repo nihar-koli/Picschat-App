@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,7 +33,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
-public class CreateSnaps extends AppCompatActivity {
+public class CreateSnaps extends AppCompatActivity implements View.OnClickListener {
 
     ImageView snapImageView;
     EditText messageEditText;
@@ -41,6 +42,8 @@ public class CreateSnaps extends AppCompatActivity {
     Button next;
     Button choose;
     ProgressDialog progressDialog;
+    ConstraintLayout createLayout;
+
 
     public void nextClicked(View view){
 
@@ -143,6 +146,9 @@ public class CreateSnaps extends AppCompatActivity {
         next = findViewById(R.id.nextButton);
         choose = findViewById(R.id.chooseImageButton);
         progressDialog = new ProgressDialog(this);
+        createLayout = findViewById(R.id.createLayout);
+
+        createLayout.setOnClickListener(this);
 
         next.setEnabled(false);
         choose.setEnabled(true);
@@ -164,5 +170,13 @@ public class CreateSnaps extends AppCompatActivity {
     private void hideProgressDialogWithTitle() {
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.dismiss();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.createLayout){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
     }
 }

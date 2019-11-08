@@ -3,12 +3,17 @@ package com.example.snapchatapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,11 +25,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnKeyListener {
 
     EditText emailEditText;
     EditText passwordEditText;
     private FirebaseAuth mAuth;
+    ConstraintLayout constraintLayout;
+    ImageView imageView;
+    TextView textView;
 
     public void snaps(){
         emailEditText.setText("");
@@ -36,14 +44,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void login(View view){
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
         if(!emailEditText.getText().toString().equals("") && !passwordEditText.getText().toString().equals("")) {
             mAuth.signInWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                               Toast.makeText(MainActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                snaps();
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setMessage("Login Successful! Welcome...")
+                                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                emailEditText.setText("");
+                                                passwordEditText.setText("");
+                                                snaps();
+                                            }
+                                        })
+                                        .setCancelable(false)
+                                        .show();
                             } else {
                                 new AlertDialog.Builder(MainActivity.this)
                                         .setIcon(android.R.drawable.ic_dialog_alert)
@@ -72,56 +92,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void signup1(View view){
-        if(!emailEditText.getText().toString().equals("") && !passwordEditText.getText().toString().equals("")) {
-            mAuth.createUserWithEmailAndPassword(emailEditText.getText().toString(), passwordEditText.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                try {
-                                    FirebaseDatabase.getInstance().getReference().child("users").child(task.getResult().getUser().getUid()).child("email").setValue(emailEditText.getText().toString());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                Toast.makeText(MainActivity.this, "SignUp Successful!", Toast.LENGTH_SHORT).show();
-                                snaps();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("ERROR!!!")
-                                        .setMessage("SignUp failed! Please try again...")
-                                        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                emailEditText.setText("");
-                                                passwordEditText.setText("");
-                                            }
-                                        })
-                                        .show();
-                            }
-
-                        }
-                    });
-        }else{
-            new AlertDialog.Builder(MainActivity.this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("ERROR!!!")
-                    .setMessage("SignUp failed! Please try again...")
-                    .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            emailEditText.setText("");
-                            passwordEditText.setText("");
-                        }
-                    })
-                    .show();
-        }
-    }
-
     public void signup(View view){
         Intent intent = new Intent(getApplicationContext(),RegisterActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -138,6 +108,15 @@ public class MainActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         mAuth = FirebaseAuth.getInstance();
+        constraintLayout = findViewById(R.id.constraintLayout);
+        imageView = findViewById(R.id.imageView);
+        textView = findViewById(R.id.textView);
+
+        constraintLayout.setOnClickListener(this);
+        imageView.setOnClickListener(this);
+        textView.setOnClickListener(this);
+
+        passwordEditText.setOnKeyListener(this);
 
         emailEditText.setText("");
         passwordEditText.setText("");
@@ -153,5 +132,22 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser != null){
             snaps();
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.constraintLayout || v.getId() == R.id.imageView || v.getId() == R.id.textView){
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+        }
+    }
+
+    @Override
+    public boolean onKey(View view, int i, KeyEvent keyEvent) {
+
+        if(i == keyEvent.KEYCODE_ENTER && keyEvent.getAction() == keyEvent.ACTION_DOWN){
+            login(view);
+        }
+        return false;
     }
 }
